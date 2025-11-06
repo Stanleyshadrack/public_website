@@ -45,4 +45,35 @@ public class PartnerServiceImpl implements PartnerService {
         );
     }
 
+    @Override
+    public PartnerDTO updatePartner(Long id, PartnerDTO dto) {
+        PartnerModel existing = partnerRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Partner not found with ID: " + id));
+
+        // ✅ Update label
+        existing.setLabel(dto.getLabel());
+
+        // ✅ Update image only if a new one was provided
+        if (dto.getImageBase64() != null && !dto.getImageBase64().isBlank()) {
+            byte[] newImage = Base64.getDecoder().decode(dto.getImageBase64());
+            existing.setImage(newImage);
+        }
+
+        PartnerModel updated = partnerRepository.savePartner(existing);
+
+        return new PartnerDTO(
+                updated.getId(),
+                Base64.getEncoder().encodeToString(updated.getImage()),
+                updated.getLabel()
+        );
+    }
+
+    @Override
+    public void deletePartner(Long id) {
+        PartnerModel existing = partnerRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Partner not found with ID: " + id));
+
+        partnerRepository.delete(existing);
+    }
 }
+

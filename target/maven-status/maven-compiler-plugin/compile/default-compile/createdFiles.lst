@@ -1,2 +1,4 @@
+com\example\company\security\ApiKeyFilter.class
 com\example\company\CompanyWebsiteApplication.class
 com\example\company\config\OpenApiConfig.class
+com\example\company\config\SecurityConfig.class

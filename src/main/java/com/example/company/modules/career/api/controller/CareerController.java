@@ -10,31 +10,43 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/V1/api/careers")
+@RequestMapping("/v1/api/careers")
 @RequiredArgsConstructor
 public class CareerController {
 
     private final CareerService service;
 
+    // ✅ Public endpoints
     @GetMapping
-    public List<JobDTO> allJobs() { return service.getAllJobs(); }
+    public List<JobDTO> allJobs() {
+        return service.getAllJobs();
+    }
 
     @GetMapping("/{id}")
-    public JobDTO job(@PathVariable Long id) { return service.getJob(id); }
+    public JobDTO job(@PathVariable Long id) {
+        return service.getJob(id);
+    }
 
-    @PostMapping
-    public JobDTO create(@RequestBody JobDTO dto) { return service.createJob(dto); }
+    // 🔒 Secure endpoints
+    @PostMapping("/actions")
+    public JobDTO create(@RequestBody JobDTO dto) {
+        return service.createJob(dto);
+    }
 
-    @PutMapping("/{id}")
-    public JobDTO update(@PathVariable Long id, @RequestBody JobDTO dto) { return service.updateJob(id, dto); }
 
-    @DeleteMapping("/{id}")
-    public void delete(@PathVariable Long id) { service.deleteJob(id); }
+    @PutMapping("/actions/{id}")
+    public JobDTO update(@PathVariable Long id, @RequestBody JobDTO dto) {
+        return service.updateJob(id, dto);
+    }
 
-    @PostMapping("/apply")
+    @DeleteMapping("/actions/{id}")
+    public void delete(@PathVariable Long id) {
+        service.deleteJob(id);
+    }
+
+    @PostMapping("/actions/apply")
     public ResponseEntity<String> apply(@RequestBody JobApplicationDTO dto) {
         service.applyForJob(dto);
         return ResponseEntity.ok("Application submitted successfully ✅");
     }
 }
-

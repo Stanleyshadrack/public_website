@@ -1,48 +1,7 @@
 spring:
-  datasource:
-    url: jdbc:postgresql://localhost:5432/websiteApplication
-    username: postgres
-    password: 1234567@
-    driver-class-name: org.postgresql.Driver
-
-  jpa:
-    database-platform: org.hibernate.dialect.PostgreSQLDialect
-    hibernate:
-      ddl-auto: update
-    show-sql: true
-    properties:
-      hibernate:
-        format_sql: true
-
-#  mail:
-#    host: ${MAIL_HOST}
-#    port: ${MAIL_PORT}
-#    username: ${MAIL_USERNAME}
-#    password: ${MAIL_PASSWORD}
-#    properties:
-#      mail.smtp.auth: true
-#      mail.smtp.starttls.enable: true
-#      mail.smtp.starttls.required: true
-#
-#mpesa:
-#  consumerKey: ${MPESA_CONSUMER_KEY}
-#  consumerSecret: ${MPESA_CONSUMER_SECRET}
-#  shortCode: ${MPESA_SHORT_CODE}
-#  passKey: ${MPESA_PASS_KEY}
-#  baseUrl: https://sandbox.safaricom.co.ke
-
-app:
-  jwt-secret: ${JWT_SECRET}
-  jwt-expiration-milliseconds: 604800000
+  profiles:
+    active: prod
 
 logging:
   level:
     root: info
-    org.springframework.security: DEBUG
-
-springdoc:
-  api-docs.path: /api-docs
-  swagger-ui.path: /swagger-ui.html
-
-server:
-  port: 8080
