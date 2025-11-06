@@ -1,7 +1,5 @@
 package com.example.company.modules.policy.api.controller;
 
-
-
 import com.example.company.modules.policy.app.dto.PolicyDTO;
 import com.example.company.modules.policy.app.service.PolicyService;
 import lombok.RequiredArgsConstructor;
@@ -16,6 +14,7 @@ public class PolicyController {
 
     private final PolicyService service;
 
+    // ✅ Public: Anyone can view policies
     @GetMapping
     public List<PolicyDTO> getAll() {
         return service.getAll();
@@ -26,20 +25,20 @@ public class PolicyController {
         return service.get(id);
     }
 
-    @PostMapping
+    // 🔒 Internal: Manage policies (create, update, delete)
+    @PostMapping("/manage")
     public PolicyDTO create(@RequestBody PolicyDTO dto) {
         return service.create(dto);
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("/manage/{id}")
     public PolicyDTO update(@PathVariable Long id, @RequestBody PolicyDTO dto) {
         return service.update(id, dto);
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/manage/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         service.delete(id);
         return ResponseEntity.noContent().build();
     }
 }
-

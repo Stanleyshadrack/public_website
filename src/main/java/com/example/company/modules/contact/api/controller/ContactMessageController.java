@@ -1,6 +1,5 @@
 package com.example.company.modules.contact.api.controller;
 
-
 import com.example.company.modules.contact.app.dto.ContactMessageDTO;
 import com.example.company.modules.contact.app.service.ContactMessageService;
 import lombok.RequiredArgsConstructor;
@@ -16,31 +15,31 @@ public class ContactMessageController {
 
     private final ContactMessageService service;
 
+    // ✅ Public endpoint
     @PostMapping
     public ContactMessageDTO submit(@RequestBody ContactMessageDTO dto) {
         return service.submit(dto);
     }
 
-    @GetMapping
+    // 🔒 Protected endpoints (for internal/admin use)
+    @GetMapping("/ops")
     public List<ContactMessageDTO> getAll() {
         return service.getAll();
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/ops/{id}")
     public ContactMessageDTO getOne(@PathVariable Long id) {
         return service.getMessage(id);
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Long id) {
-        service.deleteMessage(id);
-        return ResponseEntity.noContent().build();
-    }
-
-    @PutMapping("/{id}")
+    @PutMapping("/ops/{id}")
     public ContactMessageDTO update(@PathVariable Long id, @RequestBody ContactMessageDTO dto) {
         return service.updateMessage(id, dto);
     }
 
+    @DeleteMapping("/ops/{id}")
+    public ResponseEntity<Void> delete(@PathVariable Long id) {
+        service.deleteMessage(id);
+        return ResponseEntity.noContent().build();
+    }
 }
-

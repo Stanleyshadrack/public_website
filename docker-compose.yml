@@ -1,0 +1,20 @@
+version: '3.8'
+
+services:
+  springboot-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: springboot-app:latest
+    container_name: springboot-app
+    ports:
+      - "9091:9091"
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      SERVER_PORT: 9091
+      SPRING_DATASOURCE_URL: jdbc:postgresql://192.168.1.13:5432/website_application
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: smartcode
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      INTERNAL_API_KEY: YC6U+9QLZrFN7WJrliPsj0NAq05E+4PaDKF4XAMRL9pEKIXWI8ovPzc8nKssTbP
+    restart: always
