@@ -16,7 +16,8 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        // Let ApiKeyFilter handle access
+
+                        // 🔒 Internal routes (protected by ApiKeyFilter)
                         .requestMatchers(
                                 "/v1/api/careers/actions/**",
                                 "/v1/api/contact/ops/**",
@@ -26,7 +27,8 @@ public class SecurityConfig {
                                 "/v1/api/projects/manage/**"
                         ).permitAll()
 
-                        // Public endpoints
+
+                        // Public routes (accessible without API key)
                         .requestMatchers(
                                 "/", "/public/**",
                                 "/favicon.ico",
@@ -37,21 +39,22 @@ public class SecurityConfig {
                                 "/v1/api/contact",
                                 "/v1/api/policies/**",
                                 "/v1/api/partners/**",
-                                "/v1/api/projects/**"
+                                "/v1/api/projects/**",
+                                "/api/subscription/**",
+                                "/h2-console/**"
                         ).permitAll()
 
-                        // Default: deny anything not matched
+                        // Deny everything else by default
                         .anyRequest().denyAll()
                 )
-                //  Add ApiKeyFilter before standard authentication
+                // Add ApiKeyFilter to secure internal routes
                 .addFilterBefore(apiKeyFilter, UsernamePasswordAuthenticationFilter.class)
-                // Disable login form and HTTP basic
+                // Disable form and HTTP Basic
                 .httpBasic(basic -> basic.disable())
                 .formLogin(form -> form.disable());
 
-        // Allow frames for H2 console in dev
+        // 🧩 Allow frames (for H2 console)
         http.headers(headers -> headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::disable));
-
 
         return http.build();
     }

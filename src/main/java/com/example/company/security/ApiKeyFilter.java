@@ -7,11 +7,15 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 
 @Component
 public class ApiKeyFilter extends OncePerRequestFilter {
+
+    private static final Logger logger = LoggerFactory.getLogger(ApiKeyFilter.class);
 
     @Value("${app.internal.key}")
     private String internalKey;
@@ -22,37 +26,63 @@ public class ApiKeyFilter extends OncePerRequestFilter {
 
         String path = req.getRequestURI();
 
-        // Allow all public GET endpoints
-        if ("GET".equals(req.getMethod()) && path.startsWith("/public")) {
+        // ✅ Allow static/public assets and docs
+        if (isPublicRoute(path)) {
             chain.doFilter(req, res);
             return;
         }
 
-        // Protect internal management routes
+        // ✅ Allow newsletter subscriptions (public)
+        if (path.startsWith("/api/subscription")) {
+            chain.doFilter(req, res);
+            return;
+        }
+
+        // 🔒 Protect internal management routes
         if (isProtectedPath(path)) {
             String key = req.getHeader("X-INTERNAL-KEY");
 
-            // Validate key without logging any secrets
-            if (key == null || !key.equals(internalKey)) {
-                // Respond with generic unauthorized message (no sensitive info)
-                res.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                res.setContentType("application/json");
-                res.getWriter().write("""
-                    {
-                      "status": 401,
-                      "error": "Unauthorized",
-                      "message": "Access denied. Invalid or missing API key.",
-                      "path": "%s"
-                    }
-                    """.formatted(path));
+            if (key == null) {
+                logger.warn("❌ Missing API key on protected path: {}", path);
+                respondUnauthorized(res, path, "Missing API key");
                 return;
             }
+
+            // Masked logging (safe)
+            String maskedKey = maskKey(key);
+
+            if (!key.equals(internalKey)) {
+                logger.warn("🚫 Invalid API key [{}] on protected path: {}", maskedKey, path);
+                respondUnauthorized(res, path, "Invalid API key");
+                return;
+            }
+
+            // ✅ Authorized access
+            logger.info("✅ Valid API key [{}] authorized for path: {}", maskedKey, path);
         }
 
         chain.doFilter(req, res);
     }
 
-    // Helper method for protected routes
+    private void respondUnauthorized(HttpServletResponse res, String path, String message) throws IOException {
+        res.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        res.setContentType("application/json");
+        res.getWriter().write("""
+            {
+              "status": 401,
+              "error": "Unauthorized",
+              "message": "%s",
+              "path": "%s"
+            }
+            """.formatted(message, path));
+    }
+
+    // Safely mask key for logging (e.g., YC6U****TbP)
+    private String maskKey(String key) {
+        if (key == null || key.length() < 8) return "****";
+        return key.substring(0, 4) + "****" + key.substring(key.length() - 4);
+    }
+
     private boolean isProtectedPath(String path) {
         return path.startsWith("/v1/api/careers/actions")
                 || path.startsWith("/v1/api/contact/ops")
@@ -60,5 +90,18 @@ public class ApiKeyFilter extends OncePerRequestFilter {
                 || path.startsWith("/v1/api/partners/manage")
                 || path.startsWith("/v1/api/policies/manage")
                 || path.startsWith("/v1/api/projects/manage");
+    }
+
+    private boolean isPublicRoute(String path) {
+        return path.startsWith("/public")
+                || path.startsWith("/v1/api/faqs")
+                || path.startsWith("/v1/api/policies")
+                || path.startsWith("/v1/api/partners")
+                || path.startsWith("/v1/api/projects")
+                || path.startsWith("/v1/api/careers")
+                || path.startsWith("/swagger-ui")
+                || path.startsWith("/api-docs")
+                || path.equals("/")
+                || path.equals("/favicon.ico");
     }
 }
