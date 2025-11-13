@@ -37,9 +37,10 @@ public class ContactMessageController {
         return service.updateMessage(id, dto);
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Long id) {
+    @DeleteMapping("/ops/{id}")
+    public ResponseEntity<?> delete(@PathVariable Long id) {
         service.deleteMessage(id);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok("{\"message\": \"Message deleted successfully\"}");
     }
+
 }

@@ -1,7 +1,5 @@
 package com.example.company.modules.contact.app.service.impl;
 
-
-
 import com.example.company.modules.contact.app.dto.ContactMessageDTO;
 import com.example.company.modules.contact.app.service.ContactMessageService;
 import com.example.company.modules.contact.domain.entity.ContactMessageModel;
@@ -21,6 +19,24 @@ public class ContactMessageServiceImpl implements ContactMessageService {
 
     @Override
     public ContactMessageDTO submit(ContactMessageDTO dto) {
+
+        //  VALIDATION
+        if (dto.getFirstName() == null || dto.getFirstName().isBlank()) {
+            throw new IllegalArgumentException("First name is required");
+        }
+        if (dto.getLastName() == null || dto.getLastName().isBlank()) {
+            throw new IllegalArgumentException("Last name is required");
+        }
+        if (dto.getEmail() == null || dto.getEmail().isBlank()) {
+            throw new IllegalArgumentException("Email is required");
+        }
+        if (dto.getSubject() == null || dto.getSubject().isBlank()) {
+            throw new IllegalArgumentException("Subject is required");
+        }
+        if (dto.getMessage() == null || dto.getMessage().isBlank()) {
+            throw new IllegalArgumentException("Message text is required");
+        }
+
         ContactMessageModel saved = repo.save(new ContactMessageModel(
                 dto.getFirstName(),
                 dto.getLastName(),
@@ -50,13 +66,16 @@ public class ContactMessageServiceImpl implements ContactMessageService {
                         m.getEmail(),
                         m.getSubject(),
                         m.getMessage()
-                )).toList();
+                ))
+                .toList();
     }
 
     @Override
     public ContactMessageDTO getMessage(Long id) {
         ContactMessageModel msg = repo.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Message not found"));
+                .orElseThrow(() ->
+                        new ResponseStatusException(HttpStatus.NOT_FOUND, "Message not found")
+                );
 
         return new ContactMessageDTO(
                 msg.getId(),
@@ -71,28 +90,53 @@ public class ContactMessageServiceImpl implements ContactMessageService {
     @Override
     public void deleteMessage(Long id) {
         ContactMessageModel msg = repo.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Message not found"));
+                .orElseThrow(() ->
+                        new ResponseStatusException(HttpStatus.NOT_FOUND, "Message not found")
+                );
+
         repo.delete(msg);
     }
 
     @Override
     public ContactMessageDTO updateMessage(Long id, ContactMessageDTO dto) {
         ContactMessageModel msg = repo.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Message not found"));
+                .orElseThrow(() ->
+                        new ResponseStatusException(HttpStatus.NOT_FOUND, "Message not found")
+                );
 
-        if (dto.getFirstName() != null && !dto.getFirstName().isEmpty()) {
+        // UPDATE ONLY VALID FIELDS
+        if (dto.getFirstName() != null) {
+            if (dto.getFirstName().isBlank()) {
+                throw new IllegalArgumentException("First name cannot be empty");
+            }
             msg.setFirstName(dto.getFirstName());
         }
-        if (dto.getLastName() != null && !dto.getLastName().isEmpty()) {
+
+        if (dto.getLastName() != null) {
+            if (dto.getLastName().isBlank()) {
+                throw new IllegalArgumentException("Last name cannot be empty");
+            }
             msg.setLastName(dto.getLastName());
         }
-        if (dto.getEmail() != null && !dto.getEmail().isEmpty()) {
+
+        if (dto.getEmail() != null) {
+            if (dto.getEmail().isBlank()) {
+                throw new IllegalArgumentException("Email cannot be empty");
+            }
             msg.setEmail(dto.getEmail());
         }
-        if (dto.getSubject() != null && !dto.getSubject().isEmpty()) {
+
+        if (dto.getSubject() != null) {
+            if (dto.getSubject().isBlank()) {
+                throw new IllegalArgumentException("Subject cannot be empty");
+            }
             msg.setSubject(dto.getSubject());
         }
-        if (dto.getMessage() != null && !dto.getMessage().isEmpty()) {
+
+        if (dto.getMessage() != null) {
+            if (dto.getMessage().isBlank()) {
+                throw new IllegalArgumentException("Message text cannot be empty");
+            }
             msg.setMessage(dto.getMessage());
         }
 
@@ -107,5 +151,4 @@ public class ContactMessageServiceImpl implements ContactMessageService {
                 updated.getMessage()
         );
     }
-
 }

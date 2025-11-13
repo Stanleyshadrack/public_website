@@ -1,12 +1,12 @@
 package com.example.company.modules.project.app.service.impl;
 
-
-
 import com.example.company.modules.project.app.dto.ProjectDTO;
 import com.example.company.modules.project.app.service.ProjectService;
 import com.example.company.modules.project.domain.entity.ProjectModel;
 import com.example.company.modules.project.domain.repository.ProjectRepository;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Base64;
 import java.util.List;
@@ -36,7 +36,9 @@ public class ProjectServiceImpl implements ProjectService {
     @Override
     public ProjectDTO getProjectById(Long id) {
         ProjectModel p = projectRepository.findProjectById(id)
-                .orElseThrow(() -> new RuntimeException("Project not found"));
+                .orElseThrow(() ->
+                        new ResponseStatusException(HttpStatus.NOT_FOUND, "Project not found")
+                );
 
         return new ProjectDTO(
                 p.getId(),
@@ -48,15 +50,34 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     public ProjectDTO createProject(ProjectDTO dto) {
-        // ✅ decode base64 image string to byte[]
-        byte[] imageBytes = Base64.getDecoder().decode(dto.getImageBase64());
+
+        // Validate required fields
+        if (dto.getTitle() == null || dto.getTitle().isBlank()) {
+            throw new IllegalArgumentException("Project title is required");
+        }
+
+        if (dto.getDescription() == null || dto.getDescription().isBlank()) {
+            throw new IllegalArgumentException("Project description is required");
+        }
+
+        if (dto.getImageBase64() == null || dto.getImageBase64().isBlank()) {
+            throw new IllegalArgumentException("Project image is required");
+        }
+
+        // Decode Base64 safely
+        byte[] imageBytes;
+        try {
+            imageBytes = Base64.getDecoder().decode(dto.getImageBase64());
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException("Invalid Base64 image format");
+        }
 
         ProjectModel project = new ProjectModel(imageBytes, dto.getTitle(), dto.getDescription());
         ProjectModel saved = projectRepository.saveProject(project);
 
         return new ProjectDTO(
                 saved.getId(),
-                Base64.getEncoder().encodeToString(saved.getImage()),  // ✅ return as Base64
+                Base64.getEncoder().encodeToString(saved.getImage()),
                 saved.getTitle(),
                 saved.getDescription()
         );
@@ -64,22 +85,30 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     public ProjectDTO updateProject(Long id, ProjectDTO dto) {
-        ProjectModel existing = projectRepository.findProjectById(id)
-                .orElseThrow(() -> new RuntimeException("Project not found"));
 
-        // ✅ Update title only if provided
-        if (dto.getTitle() != null && !dto.getTitle().isEmpty()) {
+        ProjectModel existing = projectRepository.findProjectById(id)
+                .orElseThrow(() ->
+                        new ResponseStatusException(HttpStatus.NOT_FOUND, "Project not found")
+                );
+
+        // Title update
+        if (dto.getTitle() != null && !dto.getTitle().isBlank()) {
             existing.setTitle(dto.getTitle());
         }
 
-        // ✅ Update description only if provided
-        if (dto.getDescription() != null && !dto.getDescription().isEmpty()) {
+        // Description update
+        if (dto.getDescription() != null && !dto.getDescription().isBlank()) {
             existing.setDescription(dto.getDescription());
         }
 
-        // ✅ Update image only if provided
-        if (dto.getImageBase64() != null && !dto.getImageBase64().isEmpty()) {
-            existing.setImage(Base64.getDecoder().decode(dto.getImageBase64()));
+        // Image update
+        if (dto.getImageBase64() != null && !dto.getImageBase64().isBlank()) {
+            try {
+                byte[] newImage = Base64.getDecoder().decode(dto.getImageBase64());
+                existing.setImage(newImage);
+            } catch (IllegalArgumentException e) {
+                throw new IllegalArgumentException("Invalid Base64 image format");
+            }
         }
 
         ProjectModel updated = projectRepository.saveProject(existing);
@@ -92,11 +121,12 @@ public class ProjectServiceImpl implements ProjectService {
         );
     }
 
-
     @Override
     public void deleteProject(Long id) {
         ProjectModel existing = projectRepository.findProjectById(id)
-                .orElseThrow(() -> new RuntimeException("Project not found"));
+                .orElseThrow(() ->
+                        new ResponseStatusException(HttpStatus.NOT_FOUND, "Project not found")
+                );
 
         projectRepository.deleteProject(existing);
     }

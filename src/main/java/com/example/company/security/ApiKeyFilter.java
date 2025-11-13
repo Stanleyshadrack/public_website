@@ -11,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 
 @Component
 public class ApiKeyFilter extends OncePerRequestFilter {
@@ -52,7 +53,7 @@ public class ApiKeyFilter extends OncePerRequestFilter {
             String maskedKey = maskKey(key);
 
             if (!key.equals(internalKey)) {
-                logger.warn("🚫 Invalid API key [{}] on protected path: {}", maskedKey, path);
+                logger.warn(" Invalid API key [{}] on protected path: {}", maskedKey, path);
                 respondUnauthorized(res, path, "Invalid API key");
                 return;
             }
@@ -67,15 +68,18 @@ public class ApiKeyFilter extends OncePerRequestFilter {
     private void respondUnauthorized(HttpServletResponse res, String path, String message) throws IOException {
         res.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         res.setContentType("application/json");
+
         res.getWriter().write("""
-            {
-              "status": 401,
-              "error": "Unauthorized",
-              "message": "%s",
-              "path": "%s"
-            }
-            """.formatted(message, path));
+        {
+          "timestamp": "%s",
+          "status": 401,
+          "error": "Unauthorized",
+          "message": "%s",
+          "path": "%s"
+        }
+        """.formatted(LocalDateTime.now(), message, path));
     }
+
 
     // Safely mask key for logging (e.g., YC6U****TbP)
     private String maskKey(String key) {
@@ -94,14 +98,21 @@ public class ApiKeyFilter extends OncePerRequestFilter {
 
     private boolean isPublicRoute(String path) {
         return path.startsWith("/public")
-                || path.startsWith("/v1/api/faqs")
-                || path.startsWith("/v1/api/policies")
-                || path.startsWith("/v1/api/partners")
-                || path.startsWith("/v1/api/projects")
-                || path.startsWith("/v1/api/careers")
+                || path.equals("/v1/api/faqs")
+                || path.startsWith("/v1/api/faqs/") && !path.contains("/manage")
+                || path.equals("/v1/api/policies")
+                || path.startsWith("/v1/api/policies/") && !path.contains("/manage")
+                || path.equals("/v1/api/partners")
+                || path.startsWith("/v1/api/partners/") && !path.contains("/manage")
+                || path.equals("/v1/api/projects")
+                || path.startsWith("/v1/api/projects/") && !path.contains("/manage")
+                || path.equals("/v1/api/careers")
+                || path.startsWith("/v1/api/careers/") && !path.contains("/actions")
                 || path.startsWith("/swagger-ui")
                 || path.startsWith("/api-docs")
                 || path.equals("/")
                 || path.equals("/favicon.ico");
     }
+
 }
+

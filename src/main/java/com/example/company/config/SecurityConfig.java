@@ -16,8 +16,6 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-
-                        // 🔒 Internal routes (protected by ApiKeyFilter)
                         .requestMatchers(
                                 "/v1/api/careers/actions/**",
                                 "/v1/api/contact/ops/**",
@@ -27,8 +25,7 @@ public class SecurityConfig {
                                 "/v1/api/projects/manage/**"
                         ).permitAll()
 
-
-                        // Public routes (accessible without API key)
+                        // Public routes
                         .requestMatchers(
                                 "/", "/public/**",
                                 "/favicon.ico",
@@ -44,16 +41,14 @@ public class SecurityConfig {
                                 "/h2-console/**"
                         ).permitAll()
 
-                        // Deny everything else by default
+                        // Deny everything else
                         .anyRequest().denyAll()
                 )
-                // Add ApiKeyFilter to secure internal routes
                 .addFilterBefore(apiKeyFilter, UsernamePasswordAuthenticationFilter.class)
-                // Disable form and HTTP Basic
                 .httpBasic(basic -> basic.disable())
                 .formLogin(form -> form.disable());
 
-        // 🧩 Allow frames (for H2 console)
+        // Allow frames for H2 console
         http.headers(headers -> headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::disable));
 
         return http.build();
