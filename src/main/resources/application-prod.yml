@@ -3,7 +3,8 @@ server:
 
 spring:
   datasource:
-    url: jdbc:postgresql://192.168.1.13:5432/website_application
+    url: jdbc:postgresql://155.133.22.75:5432/website_application
+
     username: postgres
     password: smartcode
     driver-class-name: org.postgresql.Driver
@@ -15,4 +16,4 @@ spring:
 
 app:
   internal:
-    key: ${INTERNAL_API_KEY:dev-key}
+    key: ${X-INTERNAL-KEY:dev-key}

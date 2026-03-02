@@ -33,7 +33,7 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(body, ex.getStatusCode());
     }
 
-    // 🔥 Handle IllegalArgumentException (bad inputs, invalid base64, invalid id, etc.)
+    //  Handle IllegalArgumentException (bad inputs, invalid base64, invalid id, etc.)
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<Object> handleIllegalArgument(IllegalArgumentException ex, WebRequest request) {
         Map<String, Object> body = new HashMap<>();
@@ -60,7 +60,7 @@ public class GlobalExceptionHandler {
     }
 
 
-    // 🔥 Handle validation errors
+    // Handle validation errors
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Object> handleValidationErrors(MethodArgumentNotValidException ex) {
         Map<String, Object> body = new HashMap<>();
@@ -78,7 +78,7 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
     }
 
-    // 🔥 Handle all other unexpected errors
+    // Handle all other unexpected errors
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Object> handleGeneral(Exception ex, WebRequest request) {
 

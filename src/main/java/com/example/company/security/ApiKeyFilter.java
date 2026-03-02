@@ -27,13 +27,13 @@ public class ApiKeyFilter extends OncePerRequestFilter {
 
         String path = req.getRequestURI();
 
-        // ✅ Allow static/public assets and docs
+        //  Allow static/public assets and docs
         if (isPublicRoute(path)) {
             chain.doFilter(req, res);
             return;
         }
 
-        // ✅ Allow newsletter subscriptions (public)
+        //  Allow newsletter subscriptions (public)
         if (path.startsWith("/api/subscription")) {
             chain.doFilter(req, res);
             return;
@@ -44,7 +44,7 @@ public class ApiKeyFilter extends OncePerRequestFilter {
             String key = req.getHeader("X-INTERNAL-KEY");
 
             if (key == null) {
-                logger.warn("❌ Missing API key on protected path: {}", path);
+                logger.warn("Missing API key on protected path: {}", path);
                 respondUnauthorized(res, path, "Missing API key");
                 return;
             }
@@ -58,8 +58,8 @@ public class ApiKeyFilter extends OncePerRequestFilter {
                 return;
             }
 
-            // ✅ Authorized access
-            logger.info("✅ Valid API key [{}] authorized for path: {}", maskedKey, path);
+            //  Authorized access
+            logger.info(" Valid API key [{}] authorized for path: {}", maskedKey, path);
         }
 
         chain.doFilter(req, res);

@@ -41,6 +41,17 @@ public class SecurityConfig {
                                 "/h2-console/**"
                         ).permitAll()
 
+                        .requestMatchers(
+                                "/", "/public/**",
+                                "/favicon.ico",
+                                "/swagger-ui.html", "/swagger-ui/**",
+                                "/v3/api-docs/**",
+                                "/api-docs/**",
+                                "/swagger-resources/**",
+                                "/webjars/**",
+                                "/h2-console/**"
+                        ).permitAll()
+
                         // Deny everything else
                         .anyRequest().denyAll()
                 )
@@ -53,4 +64,6 @@ public class SecurityConfig {
 
         return http.build();
     }
+
+
 }

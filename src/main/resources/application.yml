@@ -1,21 +1,17 @@
 server:
-  port: ${SERVER_PORT:8080}
+  port: ${SERVER_PORT:9091}
 
 spring:
   datasource:
-    url: jdbc:h2:mem:testdb
-    driver-class-name: org.h2.Driver
-    username: sa
-    password: password
-
-  h2:
-    console:
-      enabled: true
+    url: jdbc:postgresql://192.168.1.13:5432/website_application
+    username: postgres
+    password: smartcode
+    driver-class-name: org.postgresql.Driver
 
   mail:
     host: ${MAIL_HOST:smtp.gmail.com}
     port: ${MAIL_PORT:587}
-    username: ${MAIL_USERNAME:kipkemeikevin23@gmail.com}
+    username: ${MAIL_USERNAME:mandestanleys@gmail.com}
     password: ${MAIL_PASSWORD:gkfwcpgrequzdabd}
     properties:
       mail:
@@ -25,14 +21,11 @@ spring:
             enable: true
             required: true
 
-  profiles:
-    active: prod
-
-logging:
-  level:
-    root: info
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
 
 app:
   internal:
-    key: YC6U+9QLZrFN7WJrliPsj0NAq05E+4PaDKF4XAMRL9pEKIXWI8ovPzc8nKssTbP
-
+    key: ${X-INTERNAL-KEY:dev-key}

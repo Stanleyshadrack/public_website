@@ -22,6 +22,8 @@ public class ProjectModel {
     private byte[] image;
 
     private String title;
+
+    @Column(columnDefinition = "TEXT")
     private String description;
 
     // Optional custom constructor
