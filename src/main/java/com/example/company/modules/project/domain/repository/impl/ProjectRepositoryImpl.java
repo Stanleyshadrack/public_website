@@ -23,6 +23,13 @@ public class ProjectRepositoryImpl implements ProjectRepository {
     }
 
     @Override
+    public Optional<ProjectModel> findByClientAndTitle(String client, String title) {
+        return jpaRepo.findByClientAndTitle(client, title);
+    }
+
+
+
+    @Override
     public Optional<ProjectModel> findProjectById(Long id) {
         return jpaRepo.findById(id);
     }

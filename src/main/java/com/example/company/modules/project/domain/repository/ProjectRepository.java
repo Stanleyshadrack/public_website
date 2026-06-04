@@ -10,4 +10,5 @@ public interface ProjectRepository {
     Optional<ProjectModel> findProjectById(Long id);
     ProjectModel saveProject(ProjectModel project);
     void deleteProject(ProjectModel project);
+    Optional<ProjectModel> findByClientAndTitle(String client, String title);
 }

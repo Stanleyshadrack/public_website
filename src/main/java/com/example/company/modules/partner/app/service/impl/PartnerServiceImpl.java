@@ -4,7 +4,9 @@ import com.example.company.modules.partner.app.dto.PartnerDTO;
 import com.example.company.modules.partner.app.service.PartnerService;
 import com.example.company.modules.partner.domain.entity.PartnerModel;
 import com.example.company.modules.partner.domain.repository.PartnerRepository;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Base64;
 import java.util.List;
@@ -24,7 +26,7 @@ public class PartnerServiceImpl implements PartnerService {
                 .stream()
                 .map(p -> new PartnerDTO(
                         p.getId(),
-                        Base64.getEncoder().encodeToString(p.getImage()), // ✅ convert bytes to Base64
+                        Base64.getEncoder().encodeToString(p.getImage()),
                         p.getLabel()
                 ))
                 .toList();
@@ -32,31 +34,55 @@ public class PartnerServiceImpl implements PartnerService {
 
     @Override
     public PartnerDTO createPartner(PartnerDTO dto) {
-        // ✅ decode base64 image string to byte[]
-        byte[] imageBytes = Base64.getDecoder().decode(dto.getImageBase64());
+
+        if (dto.getLabel() == null || dto.getLabel().isBlank()) {
+            throw new IllegalArgumentException("Partner label is required.");
+        }
+
+        if (dto.getImageBase64() == null || dto.getImageBase64().isBlank()) {
+            throw new IllegalArgumentException("Image base64 data is required.");
+        }
+
+        byte[] imageBytes;
+        try {
+            imageBytes = Base64.getDecoder().decode(dto.getImageBase64());
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException("Invalid Base64 image data.");
+        }
 
         PartnerModel partner = new PartnerModel(imageBytes, dto.getLabel());
         PartnerModel saved = partnerRepository.savePartner(partner);
 
         return new PartnerDTO(
                 saved.getId(),
-                Base64.getEncoder().encodeToString(saved.getImage()),  // ✅ return as Base64
+                Base64.getEncoder().encodeToString(saved.getImage()),
                 saved.getLabel()
         );
     }
 
     @Override
     public PartnerDTO updatePartner(Long id, PartnerDTO dto) {
+
         PartnerModel existing = partnerRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Partner not found with ID: " + id));
+                .orElseThrow(() ->
+                        new ResponseStatusException(HttpStatus.NOT_FOUND, "Partner not found with ID: " + id)
+                );
 
-        // ✅ Update label
-        existing.setLabel(dto.getLabel());
+        // Update label
+        if (dto.getLabel() != null && !dto.getLabel().isBlank()) {
+            existing.setLabel(dto.getLabel());
+        }
 
-        // ✅ Update image only if a new one was provided
+        // Update image Base64 only if provided
         if (dto.getImageBase64() != null && !dto.getImageBase64().isBlank()) {
-            byte[] newImage = Base64.getDecoder().decode(dto.getImageBase64());
-            existing.setImage(newImage);
+
+            try {
+                byte[] newImage = Base64.getDecoder().decode(dto.getImageBase64());
+                existing.setImage(newImage);
+            } catch (IllegalArgumentException e) {
+                throw new IllegalArgumentException("Invalid Base64 image data.");
+            }
+
         }
 
         PartnerModel updated = partnerRepository.savePartner(existing);
@@ -71,9 +97,10 @@ public class PartnerServiceImpl implements PartnerService {
     @Override
     public void deletePartner(Long id) {
         PartnerModel existing = partnerRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Partner not found with ID: " + id));
+                .orElseThrow(() ->
+                        new ResponseStatusException(HttpStatus.NOT_FOUND, "Partner not found with ID: " + id)
+                );
 
         partnerRepository.delete(existing);
     }
 }
-

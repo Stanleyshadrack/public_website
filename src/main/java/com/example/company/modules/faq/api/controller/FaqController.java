@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/V1/api/faqs")
+@RequestMapping("/v1/api/faqs")
 @RequiredArgsConstructor
 public class FaqController {
 
@@ -25,6 +25,7 @@ public class FaqController {
     public FaqDTO getFaq(@PathVariable Long id) {
         return service.getFaq(id);
     }
+
 
     // 🔒 Protected endpoints (only internal backend can call these)
     @PostMapping("/manage")

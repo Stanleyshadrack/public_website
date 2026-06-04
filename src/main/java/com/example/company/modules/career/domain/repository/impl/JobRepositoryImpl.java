@@ -20,5 +20,10 @@ public class JobRepositoryImpl implements JobRepository {
     public Optional<JobModel> getJob(Long id) { return jpa.findById(id); }
     public JobModel saveJob(JobModel job) { return jpa.save(job); }
     public void deleteJob(JobModel job) { jpa.delete(job); }
+
+    @Override
+    public boolean existsByTitleIgnoreCase(String title) {
+        return jpa.existsByTitleIgnoreCase(title);
+    }
 }
 

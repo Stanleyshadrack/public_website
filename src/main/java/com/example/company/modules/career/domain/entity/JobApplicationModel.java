@@ -1,17 +1,14 @@
 package com.example.company.modules.career.domain.entity;
 
-
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity @Table(name = "job_applications")
+@Entity
+@Table(name = "job_applications")
 public class JobApplicationModel {
 
     @Id
@@ -19,10 +16,26 @@ public class JobApplicationModel {
     private Long id;
 
     private Long jobId;
-    private String fullName;
+    private String jobTitle;
+
+    private String firstName;
+    private String lastName;
+
     private String email;
-    private String message;
+    private String phone;
+
+    private String linkedin;
+    private String portfolio;
 
     @Column(columnDefinition = "TEXT")
-    private String resumeBase64; // later, we can switch to file upload
+    private String experience;
+
+    @Column(columnDefinition = "TEXT")
+    private String motivation;
+
+    private String referral;
+
+    // File storage (recommended: store URL, not file itself)
+    private String resumeUrl;
+    private String coverLetterUrl;
 }

@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/V1/api/contact")
+@RequestMapping("/v1/api/contact")
 @RequiredArgsConstructor
 public class ContactMessageController {
 
@@ -38,8 +38,9 @@ public class ContactMessageController {
     }
 
     @DeleteMapping("/ops/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Long id) {
+    public ResponseEntity<?> delete(@PathVariable Long id) {
         service.deleteMessage(id);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok("{\"message\": \"Message deleted successfully\"}");
     }
+
 }

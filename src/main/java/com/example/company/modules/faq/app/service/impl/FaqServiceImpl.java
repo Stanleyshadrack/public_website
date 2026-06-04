@@ -15,7 +15,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class FaqServiceImpl implements FaqService {
 
-    private final FaqRepository faqRepository; // ✅ depends on interface
+    private final FaqRepository faqRepository;
 
     @Override
     public List<FaqDTO> getAllFaqs() {
@@ -25,46 +25,83 @@ public class FaqServiceImpl implements FaqService {
                         f.getId(),
                         f.getQuestion(),
                         f.getAnswer()
-                )).toList();
+                ))
+                .toList();
     }
 
     @Override
     public FaqDTO getFaq(Long id) {
         FaqModel faq = faqRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "FAQ not found"));
+                .orElseThrow(() ->
+                        new ResponseStatusException(HttpStatus.NOT_FOUND, "FAQ not found")
+                );
 
-        return new FaqDTO(faq.getId(), faq.getQuestion(), faq.getAnswer());
+        return new FaqDTO(
+                faq.getId(),
+                faq.getQuestion(),
+                faq.getAnswer()
+        );
     }
 
     @Override
     public FaqDTO createFaq(FaqDTO dto) {
+
+        //  VALIDATION
+        if (dto.getQuestion() == null || dto.getQuestion().isBlank()) {
+            throw new IllegalArgumentException("FAQ question is required");
+        }
+
+        if (dto.getAnswer() == null || dto.getAnswer().isBlank()) {
+            throw new IllegalArgumentException("FAQ answer is required");
+        }
+
         FaqModel model = new FaqModel(dto.getQuestion(), dto.getAnswer());
         FaqModel saved = faqRepository.saveFaq(model);
 
-        return new FaqDTO(saved.getId(), saved.getQuestion(), saved.getAnswer());
+        return new FaqDTO(
+                saved.getId(),
+                saved.getQuestion(),
+                saved.getAnswer()
+        );
     }
 
     @Override
     public FaqDTO updateFaq(Long id, FaqDTO dto) {
         FaqModel faq = faqRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "FAQ not found"));
+                .orElseThrow(() ->
+                        new ResponseStatusException(HttpStatus.NOT_FOUND, "FAQ not found")
+                );
 
-        if (dto.getQuestion() != null && !dto.getQuestion().isEmpty()) {
+        //  UPDATE ONLY VALID FIELDS
+        if (dto.getQuestion() != null) {
+            if (dto.getQuestion().isBlank()) {
+                throw new IllegalArgumentException("FAQ question cannot be empty");
+            }
             faq.setQuestion(dto.getQuestion());
         }
-        if (dto.getAnswer() != null && !dto.getAnswer().isEmpty()) {
+
+        if (dto.getAnswer() != null) {
+            if (dto.getAnswer().isBlank()) {
+                throw new IllegalArgumentException("FAQ answer cannot be empty");
+            }
             faq.setAnswer(dto.getAnswer());
         }
 
         FaqModel updated = faqRepository.saveFaq(faq);
 
-        return new FaqDTO(updated.getId(), updated.getQuestion(), updated.getAnswer());
+        return new FaqDTO(
+                updated.getId(),
+                updated.getQuestion(),
+                updated.getAnswer()
+        );
     }
 
     @Override
     public void deleteFaq(Long id) {
         FaqModel faq = faqRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "FAQ not found"));
+                .orElseThrow(() ->
+                        new ResponseStatusException(HttpStatus.NOT_FOUND, "FAQ not found")
+                );
 
         faqRepository.deleteFaq(faq);
     }

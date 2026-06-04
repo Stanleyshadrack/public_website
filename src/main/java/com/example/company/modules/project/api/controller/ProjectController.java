@@ -17,7 +17,7 @@ public class ProjectController {
         this.projectService = projectService;
     }
 
-    // 🟢 Public routes
+    //  Public routes
     @GetMapping
     public ResponseEntity<List<ProjectDTO>> getAllProjects() {
         return ResponseEntity.ok(projectService.getAllProjects());
@@ -28,7 +28,7 @@ public class ProjectController {
         return ResponseEntity.ok(projectService.getProjectById(id));
     }
 
-    // 🔒 Internal routes — protected by X-INTERNAL-KEY
+    //  Internal routes — protected by X-INTERNAL-KEY
     @PostMapping("/manage")
     public ResponseEntity<ProjectDTO> createProject(@RequestBody ProjectDTO dto) {
         return ResponseEntity.ok(projectService.createProject(dto));

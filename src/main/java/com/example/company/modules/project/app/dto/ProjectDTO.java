@@ -12,4 +12,6 @@ public class ProjectDTO {
     private String imageBase64;
     private String title;
     private  String description;
+    private String client;
+    private String achievements;
 }

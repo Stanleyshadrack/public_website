@@ -1,16 +1,14 @@
 package com.example.company.modules.policy.app.service.impl;
 
-
-
 import com.example.company.modules.policy.app.dto.PolicyDTO;
 import com.example.company.modules.policy.app.service.PolicyService;
 import com.example.company.modules.policy.domain.entity.PolicyModel;
 import com.example.company.modules.policy.domain.repository.PolicyRepository;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.util.List;
 
@@ -19,7 +17,7 @@ import java.util.List;
 public class PolicyServiceImpl implements PolicyService {
 
     private final PolicyRepository repo;
-    private final ObjectMapper mapper = new ObjectMapper(); // for JSON convert
+    private final ObjectMapper mapper = new ObjectMapper();
 
     @Override
     public List<PolicyDTO> getAll() {
@@ -35,7 +33,9 @@ public class PolicyServiceImpl implements PolicyService {
     @Override
     public PolicyDTO get(Long id) {
         PolicyModel p = repo.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Policy not found"));
+                .orElseThrow(() ->
+                        new ResponseStatusException(HttpStatus.NOT_FOUND, "Policy not found")
+                );
 
         return new PolicyDTO(
                 p.getId(),
@@ -48,6 +48,25 @@ public class PolicyServiceImpl implements PolicyService {
 
     @Override
     public PolicyDTO create(PolicyDTO dto) {
+
+        // 🔍 VALIDATION
+        if (dto.getTitle() == null || dto.getTitle().isBlank()) {
+            throw new IllegalArgumentException("Policy title is required");
+        }
+
+        if (dto.getDescription() == null || dto.getDescription().isBlank()) {
+            throw new IllegalArgumentException("Policy description is required");
+        }
+
+        if (dto.getContent() == null) {
+            throw new IllegalArgumentException("Policy content is required");
+        }
+
+        if (dto.getType() == null) {
+            throw new IllegalArgumentException("Policy type is required");
+        }
+
+        // Convert structured "content" to JSON
         String contentJson = serializeContent(dto.getContent());
 
         PolicyModel saved = repo.savePolicy(new PolicyModel(
@@ -63,12 +82,25 @@ public class PolicyServiceImpl implements PolicyService {
     @Override
     public PolicyDTO update(Long id, PolicyDTO dto) {
         PolicyModel p = repo.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Policy not found"));
+                .orElseThrow(() ->
+                        new ResponseStatusException(HttpStatus.NOT_FOUND, "Policy not found")
+                );
 
-        if (dto.getTitle() != null) p.setTitle(dto.getTitle());
-        if (dto.getDescription() != null) p.setDescription(dto.getDescription());
-        if (dto.getContent() != null) p.setContent(serializeContent(dto.getContent()));
-        if (dto.getType() != null) p.setType(dto.getType());
+        if (dto.getTitle() != null && !dto.getTitle().isBlank()) {
+            p.setTitle(dto.getTitle());
+        }
+
+        if (dto.getDescription() != null && !dto.getDescription().isBlank()) {
+            p.setDescription(dto.getDescription());
+        }
+
+        if (dto.getContent() != null) {
+            p.setContent(serializeContent(dto.getContent()));
+        }
+
+        if (dto.getType() != null) {
+            p.setType(dto.getType());
+        }
 
         PolicyModel updated = repo.savePolicy(p);
         return get(updated.getId());
@@ -77,25 +109,29 @@ public class PolicyServiceImpl implements PolicyService {
     @Override
     public void delete(Long id) {
         PolicyModel p = repo.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Policy not found"));
+                .orElseThrow(() ->
+                        new ResponseStatusException(HttpStatus.NOT_FOUND, "Policy not found")
+                );
 
         repo.deletePolicy(p);
     }
 
+    // 🔧 SAFE PARSE JSON → Object (list/map/etc)
     private Object parseContent(String content) {
         try {
             return mapper.readValue(content, Object.class);
         } catch (Exception e) {
+            // content is not JSON, return raw
             return content;
         }
     }
 
+    // 🔧 Convert object to JSON string
     private String serializeContent(Object content) {
         try {
             return mapper.writeValueAsString(content);
         } catch (Exception e) {
-            throw new RuntimeException("Invalid content format");
+            throw new IllegalArgumentException("Invalid content format: must be JSON-compatible");
         }
     }
 }
-

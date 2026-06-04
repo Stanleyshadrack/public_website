@@ -6,7 +6,20 @@ spring:
     url: jdbc:h2:mem:testdb
     driver-class-name: org.h2.Driver
     username: sa
-    password: password
+    password: smartcode
+
+  mail:
+    host: ${MAIL_HOST:smtp.gmail.com}
+    port: ${MAIL_PORT:587}
+    username: ${MAIL_USERNAME:mandestanleys@gmail.com}
+    password: ${MAIL_PASSWORD:gkfwcpgrequzdabd}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+            required: true
 
   h2:
     console:
@@ -14,4 +27,4 @@ spring:
 
 app:
   internal:
-    key: YC6U+9QLZrFN7WJrliPsj0NAq05E+4PaDKF4XAMRL9pEKIXWI8ovPzc8nKssTbP
+    key: ${X-INTERNAL-KEY:dev-key}

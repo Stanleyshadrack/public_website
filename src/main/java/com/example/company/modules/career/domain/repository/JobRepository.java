@@ -10,4 +10,5 @@ public interface JobRepository {
     Optional<JobModel> getJob(Long id);
     JobModel saveJob(JobModel job);
     void deleteJob(JobModel job);
+    boolean existsByTitleIgnoreCase(String title);
 }
