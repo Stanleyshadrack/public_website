@@ -3,6 +3,7 @@ C:\Users\USER\meraki\company-website-backend\src\main\java\com\example\company\m
 C:\Users\USER\meraki\company-website-backend\src\main\java\com\example\company\modules\career\domain\repository\impl\JobRepositoryImpl.java
 C:\Users\USER\meraki\company-website-backend\src\main\java\com\example\company\modules\career\domain\entity\JobModel.java
 C:\Users\USER\meraki\company-website-backend\src\main\java\com\example\company\modules\message\api\controller\MessageApiController.java
+C:\Users\USER\meraki\company-website-backend\src\main\java\com\example\company\config\InternalConfig.java
 C:\Users\USER\meraki\company-website-backend\src\main\java\com\example\company\modules\career\domain\repository\JobRepository.java
 C:\Users\USER\meraki\company-website-backend\src\main\java\com\example\company\modules\contact\app\service\impl\SubscriptionServiceImpl.java
 C:\Users\USER\meraki\company-website-backend\src\main\java\com\example\company\modules\policy\api\controller\PolicyController.java
@@ -19,6 +20,7 @@ C:\Users\USER\meraki\company-website-backend\src\main\java\com\example\company\m
 C:\Users\USER\meraki\company-website-backend\src\main\java\com\example\company\modules\contact\infra\ContactMessageJpaRepository.java
 C:\Users\USER\meraki\company-website-backend\src\main\java\com\example\company\modules\partner\app\service\impl\PartnerServiceImpl.java
 C:\Users\USER\meraki\company-website-backend\src\main\java\com\example\company\modules\contact\domain\repository\impl\ContactMessageRepositoryImpl.java
+C:\Users\USER\meraki\company-website-backend\src\main\java\com\example\company\modules\career\app\mapper\CareerMapper.java
 C:\Users\USER\meraki\company-website-backend\src\main\java\com\example\company\modules\partner\domain\entity\PartnerModel.java
 C:\Users\USER\meraki\company-website-backend\src\main\java\com\example\company\modules\partner\domain\repository\impl\PartnerRepositoryImpl.java
 C:\Users\USER\meraki\company-website-backend\src\main\java\com\example\company\modules\project\app\dto\ProjectDTO.java
@@ -49,6 +51,7 @@ C:\Users\USER\meraki\company-website-backend\src\main\java\com\example\company\m
 C:\Users\USER\meraki\company-website-backend\src\main\java\com\example\company\modules\faq\app\service\impl\FaqServiceImpl.java
 C:\Users\USER\meraki\company-website-backend\src\main\java\com\example\company\modules\contact\domain\repository\ContactMessageRepository.java
 C:\Users\USER\meraki\company-website-backend\src\main\java\com\example\company\modules\contact\api\controller\ContactMessageController.java
+C:\Users\USER\meraki\company-website-backend\src\main\java\com\example\company\exceptions\BadRequestException.java
 C:\Users\USER\meraki\company-website-backend\src\main\java\com\example\company\modules\contact\domain\repository\impl\SubscriptionRepositoryImpl.java
 C:\Users\USER\meraki\company-website-backend\src\main\java\com\example\company\modules\message\domain\entity\MessagesModel.java
 C:\Users\USER\meraki\company-website-backend\src\main\java\com\example\company\modules\career\app\dto\JobApplicationDTO.java
@@ -65,6 +68,8 @@ C:\Users\USER\meraki\company-website-backend\src\main\java\com\example\company\m
 C:\Users\USER\meraki\company-website-backend\src\main\java\com\example\company\modules\contact\app\service\ContactMessageService.java
 C:\Users\USER\meraki\company-website-backend\src\main\java\com\example\company\security\ApiKeyFilter.java
 C:\Users\USER\meraki\company-website-backend\src\main\java\com\example\company\CompanyWebsiteApplication.java
+C:\Users\USER\meraki\company-website-backend\src\main\java\com\example\company\exceptions\GlobalExceptionHandler.java
+C:\Users\USER\meraki\company-website-backend\src\main\java\com\example\company\exceptions\NotFoundException.java
 C:\Users\USER\meraki\company-website-backend\src\main\java\com\example\company\modules\faq\app\dto\FaqDTO.java
 C:\Users\USER\meraki\company-website-backend\src\main\java\com\example\company\modules\message\domain\repository\MessagesRepository.java
 C:\Users\USER\meraki\company-website-backend\src\main\java\com\example\company\modules\contact\domain\entity\ContactMessageModel.java

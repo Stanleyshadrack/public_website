@@ -9,6 +9,7 @@ com\example\company\modules\faq\domain\repository\FaqRepository.class
 com\example\company\security\ApiKeyFilter.class
 com\example\company\modules\career\domain\repository\impl\JobApplicationRepositoryImpl.class
 com\example\company\modules\contact\domain\repository\SubscriptionRepository.class
+com\example\company\config\InternalConfig.class
 com\example\company\modules\policy\api\controller\PolicyController.class
 com\example\company\modules\contact\app\dto\SubscriptionDTO.class
 com\example\company\modules\career\domain\repository\impl\JobRepositoryImpl.class
@@ -21,6 +22,7 @@ com\example\company\modules\project\domain\repository\impl\ProjectRepositoryImpl
 com\example\company\modules\faq\api\controller\FaqController.class
 com\example\company\modules\partner\api\conroller\PartnerController.class
 com\example\company\modules\message\app\service\MessagesService.class
+com\example\company\exceptions\NotFoundException.class
 com\example\company\modules\career\app\service\CareerService.class
 com\example\company\modules\policy\infra\PolicyJpaRepository.class
 com\example\company\modules\career\api\controller\CareerController.class
@@ -56,6 +58,7 @@ com\example\company\modules\project\domain\entity\ProjectModel.class
 com\example\company\modules\message\api\controller\MessageApiController.class
 com\example\company\modules\message\domain\repository\impl\MessagesRepositoryImpl.class
 com\example\company\modules\project\api\controller\ProjectController.class
+com\example\company\exceptions\BadRequestException.class
 com\example\company\modules\contact\domain\entity\ContactMessageModel.class
 com\example\company\modules\career\infra\JobApplicationJpaRepository.class
 com\example\company\modules\policy\app\service\PolicyService.class
@@ -70,4 +73,6 @@ com\example\company\config\OpenApiConfig.class
 com\example\company\config\SecurityConfig.class
 com\example\company\infra\mail\MerakiEmailService.class
 com\example\company\modules\policy\domain\repository\PolicyRepository.class
+com\example\company\exceptions\GlobalExceptionHandler.class
+com\example\company\modules\career\app\mapper\CareerMapper.class
 com\example\company\modules\contact\app\dto\ContactMessageDTO.class

@@ -21,6 +21,9 @@ public class ProjectModel {
     @Lob
     private byte[] image;
 
+    private String client;
+    private String achievements;
+
     private String title;
 
     @Column(columnDefinition = "TEXT")

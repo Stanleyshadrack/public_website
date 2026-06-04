@@ -16,37 +16,41 @@ public class CareerController {
 
     private final CareerService service;
 
-    // ✅ Public endpoints
+    // ===== PUBLIC =====
+
     @GetMapping
-    public List<JobDTO> allJobs() {
-        return service.getAllJobs();
+    public ResponseEntity<List<JobDTO>> allJobs() {
+        return ResponseEntity.ok(service.getAllJobs());
     }
 
     @GetMapping("/{id}")
-    public JobDTO job(@PathVariable Long id) {
-        return service.getJob(id);
+    public ResponseEntity<JobDTO> job(@PathVariable Long id) {
+        return ResponseEntity.ok(service.getJob(id));
     }
 
-    // 🔒 Secure endpoints
+    // ===== ADMIN / SECURED =====
+
     @PostMapping("/actions")
-    public JobDTO create(@RequestBody JobDTO dto) {
-        return service.createJob(dto);
+    public ResponseEntity<JobDTO> create(@RequestBody JobDTO dto) {
+        return ResponseEntity.ok(service.createJob(dto));
     }
-
 
     @PutMapping("/actions/{id}")
-    public JobDTO update(@PathVariable Long id, @RequestBody JobDTO dto) {
-        return service.updateJob(id, dto);
+    public ResponseEntity<JobDTO> update(@PathVariable Long id, @RequestBody JobDTO dto) {
+        return ResponseEntity.ok(service.updateJob(id, dto));
     }
 
     @DeleteMapping("/actions/{id}")
-    public void delete(@PathVariable Long id) {
+    public ResponseEntity<String> delete(@PathVariable Long id) {
         service.deleteJob(id);
+        return ResponseEntity.ok("Job deleted successfully");
     }
+
+    // ===== APPLICATION =====
 
     @PostMapping("/actions/apply")
     public ResponseEntity<String> apply(@RequestBody JobApplicationDTO dto) {
         service.applyForJob(dto);
-        return ResponseEntity.ok("Application submitted successfully ✅");
+        return ResponseEntity.ok("Application submitted successfully");
     }
 }

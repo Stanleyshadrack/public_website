@@ -1,19 +1,35 @@
 server:
-  port: ${SERVER_PORT:9091}
+  port: 8080
 
 spring:
   datasource:
-    url: jdbc:postgresql://155.133.22.75:5432/website_application
-
+    url: jdbc:postgresql://localhost:5432/website_application
     username: postgres
-    password: smartcode
+    password: Smartcode
     driver-class-name: org.postgresql.Driver
 
   jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
       ddl-auto: update
-    show-sql: false
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+
+  mail:
+    host: ${MAIL_HOST:smtp.gmail.com}
+    port: ${MAIL_PORT:587}
+    username: ${MAIL_USERNAME:mandestanleys@gmail.com}
+    password: ${MAIL_PASSWORD:gkfwcpgrequzdabd}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+            required: true
 
 app:
   internal:
-    key: ${X-INTERNAL-KEY:dev-key}
+    key: ${X-INTERNAL-KEY:YC6U9QLZrFN7WJrliPsj0NAq05E4PaDKF4XAMRL9pEKIXWI8ovPzc8nKssTbP}

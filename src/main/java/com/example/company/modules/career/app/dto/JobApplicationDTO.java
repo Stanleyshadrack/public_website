@@ -1,6 +1,5 @@
 package com.example.company.modules.career.app.dto;
 
-
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -9,9 +8,24 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class JobApplicationDTO {
+
     private Long jobId;
-    private String fullName;
+    private String jobTitle;
+
+    private String firstName;
+    private String lastName;
+
     private String email;
-    private String resumeBase64;
-    private String message;
+    private String phone;
+
+    private String linkedin;
+    private String portfolio;
+
+    private String experience;
+    private String motivation;
+
+    private String referral;
+
+    private String resumeUrl;
+    private String coverLetterUrl;
 }

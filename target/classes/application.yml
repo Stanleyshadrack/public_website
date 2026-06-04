@@ -1,31 +1,3 @@
-server:
-  port: ${SERVER_PORT:9091}
-
 spring:
-  datasource:
-    url: jdbc:postgresql://192.168.1.13:5432/website_application
-    username: postgres
-    password: smartcode
-    driver-class-name: org.postgresql.Driver
-
-  mail:
-    host: ${MAIL_HOST:smtp.gmail.com}
-    port: ${MAIL_PORT:587}
-    username: ${MAIL_USERNAME:mandestanleys@gmail.com}
-    password: ${MAIL_PASSWORD:gkfwcpgrequzdabd}
-    properties:
-      mail:
-        smtp:
-          auth: true
-          starttls:
-            enable: true
-            required: true
-
-  jpa:
-    hibernate:
-      ddl-auto: update
-    show-sql: false
-
-app:
-  internal:
-    key: ${X-INTERNAL-KEY:dev-key}
+  profiles:
+    active: dev

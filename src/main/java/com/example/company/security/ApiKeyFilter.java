@@ -1,68 +1,85 @@
 package com.example.company.security;
 
+import com.example.company.config.InternalConfig;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
-import org.springframework.web.filter.OncePerRequestFilter;
+import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
+import org.springframework.web.filter.OncePerRequestFilter;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.io.IOException;
+import java.security.MessageDigest;
 import java.time.LocalDateTime;
+import java.util.Collections;
 
 @Component
+@RequiredArgsConstructor
 public class ApiKeyFilter extends OncePerRequestFilter {
 
     private static final Logger logger = LoggerFactory.getLogger(ApiKeyFilter.class);
 
-    @Value("${app.internal.key}")
-    private String internalKey;
+    private final InternalConfig config; // cleaner than @Value
 
     @Override
     protected void doFilterInternal(HttpServletRequest req, HttpServletResponse res, FilterChain chain)
             throws IOException, ServletException {
 
         String path = req.getRequestURI();
+        String ip = req.getRemoteAddr();
 
-        //  Allow static/public assets and docs
+        // PUBLIC ROUTES → skip filter
         if (isPublicRoute(path)) {
             chain.doFilter(req, res);
             return;
         }
 
-        //  Allow newsletter subscriptions (public)
-        if (path.startsWith("/api/subscription")) {
-            chain.doFilter(req, res);
-            return;
-        }
-
-        // 🔒 Protect internal management routes
+        // PROTECTED ROUTES
         if (isProtectedPath(path)) {
+
             String key = req.getHeader("X-INTERNAL-KEY");
 
-            if (key == null) {
-                logger.warn("Missing API key on protected path: {}", path);
+            if (key == null || key.isBlank()) {
+                logger.warn(" Missing API key | IP: {} | Path: {}", ip, path);
                 respondUnauthorized(res, path, "Missing API key");
                 return;
             }
 
-            // Masked logging (safe)
             String maskedKey = maskKey(key);
 
-            if (!key.equals(internalKey)) {
-                logger.warn(" Invalid API key [{}] on protected path: {}", maskedKey, path);
+            //  Constant-time comparison (security)
+            if (!isValidKey(key)) {
+                logger.warn(" Invalid API key [{}] | IP: {} | Path: {}", maskedKey, ip, path);
                 respondUnauthorized(res, path, "Invalid API key");
                 return;
             }
 
-            //  Authorized access
-            logger.info(" Valid API key [{}] authorized for path: {}", maskedKey, path);
+            //  AUTHENTICATE REQUEST (CRITICAL)
+            UsernamePasswordAuthenticationToken auth =
+                    new UsernamePasswordAuthenticationToken(
+                            "internal-client",
+                            null,
+                            Collections.emptyList()
+                    );
+
+            SecurityContextHolder.getContext().setAuthentication(auth);
+
+            logger.info(" Authorized [{}] | IP: {} | Path: {}", maskedKey, ip, path);
         }
 
         chain.doFilter(req, res);
+    }
+
+    // Constant-time comparison to prevent timing attacks
+    private boolean isValidKey(String providedKey) {
+        byte[] provided = providedKey.trim().getBytes();
+        byte[] actual = config.getKey().getBytes();
+        return MessageDigest.isEqual(provided, actual);
     }
 
     private void respondUnauthorized(HttpServletResponse res, String path, String message) throws IOException {
@@ -80,13 +97,7 @@ public class ApiKeyFilter extends OncePerRequestFilter {
         """.formatted(LocalDateTime.now(), message, path));
     }
 
-
-    // Safely mask key for logging (e.g., YC6U****TbP)
-    private String maskKey(String key) {
-        if (key == null || key.length() < 8) return "****";
-        return key.substring(0, 4) + "****" + key.substring(key.length() - 4);
-    }
-
+    // Protected endpoints
     private boolean isProtectedPath(String path) {
         return path.startsWith("/v1/api/careers/actions")
                 || path.startsWith("/v1/api/contact/ops")
@@ -96,23 +107,44 @@ public class ApiKeyFilter extends OncePerRequestFilter {
                 || path.startsWith("/v1/api/projects/manage");
     }
 
+    //  Public endpoints
     private boolean isPublicRoute(String path) {
         return path.startsWith("/public")
-                || path.equals("/v1/api/faqs")
-                || path.startsWith("/v1/api/faqs/") && !path.contains("/manage")
-                || path.equals("/v1/api/policies")
-                || path.startsWith("/v1/api/policies/") && !path.contains("/manage")
-                || path.equals("/v1/api/partners")
-                || path.startsWith("/v1/api/partners/") && !path.contains("/manage")
-                || path.equals("/v1/api/projects")
-                || path.startsWith("/v1/api/projects/") && !path.contains("/manage")
+                || path.equals("/")
+                || path.equals("/favicon.ico")
+
+                // careers public
                 || path.equals("/v1/api/careers")
-                || path.startsWith("/v1/api/careers/") && !path.contains("/actions")
+                || (path.startsWith("/v1/api/careers/") && !path.contains("/actions"))
+
+                // faqs public
+                || path.equals("/v1/api/faqs")
+                || (path.startsWith("/v1/api/faqs/") && !path.contains("/manage"))
+
+                // policies
+                || path.equals("/v1/api/policies")
+                || (path.startsWith("/v1/api/policies/") && !path.contains("/manage"))
+
+                // partners
+                || path.equals("/v1/api/partners")
+                || (path.startsWith("/v1/api/partners/") && !path.contains("/manage"))
+
+                // projects
+                || path.equals("/v1/api/projects")
+                || (path.startsWith("/v1/api/projects/") && !path.contains("/manage"))
+
+                // misc public
                 || path.startsWith("/swagger-ui")
                 || path.startsWith("/api-docs")
-                || path.equals("/")
-                || path.equals("/favicon.ico");
+                || path.startsWith("/v3/api-docs")
+                || path.startsWith("/webjars")
+                || path.startsWith("/h2-console")
+                || path.startsWith("/api/subscription");
     }
 
+    // Mask key for safe logging
+    private String maskKey(String key) {
+        if (key == null || key.length() < 8) return "****";
+        return key.substring(0, 4) + "****" + key.substring(key.length() - 4);
+    }
 }
-
